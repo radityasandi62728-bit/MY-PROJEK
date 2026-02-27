@@ -4,6 +4,7 @@ export default class Ai {
         this.calculator = calculator
         this.personality = "centil"
         this.memory = []
+        this.moodScore = 0
     }
     introduce(user) {
         return `Halo ${user.nama}, perkenalkan aku ${this.Ai_name}, senang bertemu denganmu!`
@@ -52,7 +53,19 @@ export default class Ai {
         return text + random
     }
 
+    getmood() {
+        if (this.moodScore <= -5) {
+            return "marah"
+        } else if (this.moodScore <= -2) { 
+            return "kesal"
+        } else {
+            return "normal"
+        }
+    }
+
     responToUser(text) {
+        
+        const mood = this.getmood()
 
         const respon = {
             "hai": "Hai juga!",
