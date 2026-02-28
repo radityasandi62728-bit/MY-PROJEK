@@ -5,6 +5,7 @@ export default class Ai {
         this.personality = "centil"
         this.memory = []
         this.moodScore = 0
+        this.startmoodRecovery()
     }
     introduce(user) {
         return `Halo ${user.nama}, perkenalkan aku ${this.Ai_name}, senang bertemu denganmu!`
@@ -27,9 +28,10 @@ export default class Ai {
         }
 
         this.memory.push({user: user.nama, message:text})
-        if (response !== " ") {
+        if (response !== "") {
             return response
         }
+        this.getMood()
         return this.introduce(user)
     }
 
@@ -53,19 +55,25 @@ export default class Ai {
         return text + random
     }
 
-    getmood() {
+    getMood() {
         if (this.moodScore <= -5) {
             return "marah"
-        } else if (this.moodScore <= -2) { 
+        } 
+        if (this.moodScore <= -2) { 
             return "kesal"
-        } else {
-            return "normal"
-        }
+        }  
+        
+        return "normal" 
     }
 
     responToUser(text) {
-        
-        const mood = this.getmood()
+        this.moodScore -= 5
+
+        if (this.memory.filter(m => m.message.toLowerCase().includes(text.toLowerCase())).length > 2) {
+            this.moodScore -= 2
+        }
+
+        const mood = this.getMood()
 
         const respon = {
             "hai": "Hai juga!",
@@ -73,11 +81,30 @@ export default class Ai {
         for (const key in respon) {
             if (text.toLowerCase().includes(key)) {
                 if (this.memory.filter(m => m.message.toLowerCase().includes(key)).length > 2) {
+                    this.moodScore -= 2
                     return `hm, berhenti godain aku! push up 20x sana!`
+                }
+                this.moodScore += 1
+                if (mood === "marah") {
+                    return `Yah, aku lagi marah nih, jangan ganggu aku!`
+                }
+                if (mood === "kesal") {
+                    return 'Iya, iya denger kok'
                 }
                 return respon[key]
             }
         }
+        this.moodScore -= 1
+        this.getMood()
         return "Maaf, aku belum mengerti itu."
     }
-}
+    startmoodRecovery() {
+        setInterval(() => {
+            if (this.moodScore > 0) {
+                this.moodScore -= 1
+            }
+            if (this.moodScore < 0) {
+                this.moodScore += 1
+            }
+        }, 50000)
+} }
