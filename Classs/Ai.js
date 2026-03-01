@@ -18,6 +18,7 @@ export default class Ai {
         if (this.calculator.isMath(text)) {
             const result = this.calculator.calculate(text)
             response += this.makeCentil(`Hasil dari ${text} adalah ${result}.`)
+            this.moodScore += 1
         } else {
             response += this.responToUser(text)
         }
@@ -28,11 +29,8 @@ export default class Ai {
         }
 
         this.memory.push({user: user.nama, message:text})
-        if (response !== "") {
-            return response
-        }
-        this.getMood()
-        return this.introduce(user)
+        return response
+      
     }
 
     async speak() {
@@ -67,10 +65,16 @@ export default class Ai {
     }
 
     responToUser(text) {
-        this.moodScore -= 5
+
 
         if (this.memory.filter(m => m.message.toLowerCase().includes(text.toLowerCase())).length > 2) {
             this.moodScore -= 2
+        }
+
+        const repeatCount = this.memory.filter(m => m.message.toLowerCase().includes(text.toLowerCase())).length
+        if (repeatCount > 2) {
+            this.moodScore -= 2
+            return `Kamu sudah bilang itu beberapa kali, berhenti ulang-ulang! push up 20x sana!`
         }
 
         const mood = this.getMood()
@@ -78,9 +82,11 @@ export default class Ai {
         const respon = {
             "hai": "Hai juga!",
             "halo": "Halo, apa kabar?", }
+
         for (const key in respon) {
             if (text.toLowerCase().includes(key)) {
-                if (this.memory.filter(m => m.message.toLowerCase().includes(key)).length > 2) {
+                const keyCount = this.memory.filter(m => m.message.toLowerCase().includes(key)).length;
+                if (keyCount > 1) {
                     this.moodScore -= 2
                     return `hm, berhenti godain aku! push up 20x sana!`
                 }
@@ -88,14 +94,14 @@ export default class Ai {
                 if (mood === "marah") {
                     return `Yah, aku lagi marah nih, jangan ganggu aku!`
                 }
+                this.moodScore += 3
                 if (mood === "kesal") {
                     return 'Iya, iya denger kok'
                 }
                 return respon[key]
             }
         }
-        this.moodScore -= 1
-        this.getMood()
+       
         return "Maaf, aku belum mengerti itu."
     }
     startmoodRecovery() {
