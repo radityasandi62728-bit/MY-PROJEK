@@ -65,43 +65,39 @@ export default class Ai {
     }
 
     responToUser(text) {
+        const lower = text.toLowerCase()
 
-
-        if (this.memory.filter(m => m.message.toLowerCase().includes(text.toLowerCase())).length > 2) {
-            this.moodScore -= 2
-        }
-
-        const repeatCount = this.memory.filter(m => m.message.toLowerCase().includes(text.toLowerCase())).length
-        if (repeatCount > 2) {
+        const repeatCount = this.memory.filter(m => m.message.toLowerCase().includes(lower)).length
+        if (repeatCount > 1) { 
             this.moodScore -= 2
             return `Kamu sudah bilang itu beberapa kali, berhenti ulang-ulang! push up 20x sana!`
         }
 
-        const mood = this.getMood()
-
         const respon = {
             "hai": "Hai juga!",
-            "halo": "Halo, apa kabar?", }
+            "halo": "Halo, apa kabar?",
+        }
 
         for (const key in respon) {
-            if (text.toLowerCase().includes(key)) {
-                const keyCount = this.memory.filter(m => m.message.toLowerCase().includes(key)).length;
+            if (lower.includes(key)) {
+                const keyCount = this.memory.filter(m => m.message.toLowerCase().includes(key)).length
                 if (keyCount > 1) {
                     this.moodScore -= 2
                     return `hm, berhenti godain aku! push up 20x sana!`
                 }
-                this.moodScore += 1
+                this.moodScore += 1 
+                const mood = this.getMood()
                 if (mood === "marah") {
                     return `Yah, aku lagi marah nih, jangan ganggu aku!`
                 }
-                this.moodScore += 3
+            
                 if (mood === "kesal") {
                     return 'Iya, iya denger kok'
                 }
                 return respon[key]
             }
         }
-       
+
         return "Maaf, aku belum mengerti itu."
     }
     startmoodRecovery() {
