@@ -29,6 +29,7 @@ export default class Ai {
         }
 
         this.memory.push({user: user.nama, message:text})
+        console.log("Mood sekarang:", this.getMood(), "| Score:", this.moodScore)
         return response
       
     }
@@ -54,7 +55,7 @@ export default class Ai {
     }
 
     getMood() {
-        if (this.moodScore <= -5) {
+        if (this.moodScore <= -10) {
             return "marah"
         } 
         if (this.moodScore <= -2) { 
@@ -69,32 +70,33 @@ export default class Ai {
 
         const repeatCount = this.memory.filter(m => m.message.toLowerCase().includes(lower)).length
         if (repeatCount > 1) { 
-            this.moodScore -= 2
+            this.moodScore -= 1
             return `Kamu sudah bilang itu beberapa kali, berhenti ulang-ulang! push up 20x sana!`
         }
 
         const respon = {
             "hai": "Hai juga!",
             "halo": "Halo, apa kabar?",
+            "celia": `Ya?, ada apa?`,
+            "apa kabar": "Aku baik-baik saja, terima kasih sudah bertanya!",
         }
 
         for (const key in respon) {
             if (lower.includes(key)) {
                 const keyCount = this.memory.filter(m => m.message.toLowerCase().includes(key)).length
                 if (keyCount > 1) {
-                    this.moodScore -= 2
+                    this.moodScore -= 1
                     return `hm, berhenti godain aku! push up 20x sana!`
                 }
-                this.moodScore += 1 
+                this.moodScore += 2
                 const mood = this.getMood()
                 if (mood === "marah") {
                     return `Yah, aku lagi marah nih, jangan ganggu aku!`
                 }
-            
                 if (mood === "kesal") {
                     return 'Iya, iya denger kok'
                 }
-                return respon[key]
+                return this.renderbyMood(respon[key])
             }
         }
 
@@ -109,4 +111,15 @@ export default class Ai {
                 this.moodScore += 1
             }
         }, 50000)
-} }
+    }
+    renderbyMood(text) {
+        const mood = this.getMood()
+        if (mood === "marah") {
+            return `Aku sedang marah, jadi aku tidak bisa menjawab dengan baik.`
+        }
+        if (mood === "kesal") {
+            return `Aku sedang kesal, jadi aku tidak bisa menjawab dengan baik.`
+        }
+        return text
+    } 
+}
