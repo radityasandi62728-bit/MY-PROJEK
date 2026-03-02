@@ -53,17 +53,7 @@ export default class Ai {
         const random = kata[Math.floor(Math.random() * kata.length)]
         return text + random
     }
-
-    getMood() {
-        if (this.moodScore <= -10) {
-            return "marah"
-        } 
-        if (this.moodScore <= -2) { 
-            return "kesal"
-        }  
-        
-        return "normal" 
-    }
+    
 
     responToUser(text) {
         const lower = text.toLowerCase()
@@ -122,4 +112,15 @@ export default class Ai {
         }
         return text
     } 
+
+    getMood() {
+        if (this.moodScore <= -10) {
+            return "marah"
+        } 
+        if (this.moodScore <= -2) { 
+            return "kesal"
+        }  
+        
+        return "normal" 
+    }
 }
