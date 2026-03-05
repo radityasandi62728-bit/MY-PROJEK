@@ -1,3 +1,4 @@
+import Ai_Attitude from "./Ai_Asset/Ai_Attitude.js"
 export default class Ai {
     constructor(Ai_name, calculator) {
         this.Ai_name = Ai_name
@@ -5,6 +6,7 @@ export default class Ai {
         this.personality = "centil"
         this.memory = []
         this.moodScore = 0
+        this.attitude = new Ai_Attitude()
         this.startmoodRecovery()
     }
     introduce(user) {
@@ -12,6 +14,8 @@ export default class Ai {
     }
     async generateResponse(user, text) {
         await this.think()
+        const mood = this.getMood();
+        const tambahan = this.attitude.getrandomAttitude(mood);
 
         const privousMathCount = this.memory.filter(m => this.calculator.isMath(m.message)).length
         let response = ""
@@ -30,7 +34,7 @@ export default class Ai {
 
         this.memory.push({user: user.nama, message:text})
         console.log("Mood sekarang:", this.getMood(), "| Score:", this.moodScore)
-        return response
+        return response += " " + tambahan
       
     }
 
@@ -66,7 +70,7 @@ export default class Ai {
 
         const respon = {
             "hai": "Hai juga!",
-            "halo": "Halo, apa kabar?",
+            "halo": "Halo",
             "celia": `Ya?, ada apa?`,
             "apa kabar": "Aku baik-baik saja, terima kasih sudah bertanya!",
         }
@@ -80,8 +84,8 @@ export default class Ai {
                 }
                 this.moodScore += 2
                 const mood = this.getMood()
-                if (mood === "marah") {
-                    return `Yah, aku lagi marah nih, jangan ganggu aku!`
+                if (this.mood === "marah") {
+                    return this.attitude.getrandomAttitude("angry")
                 }
                 if (mood === "kesal") {
                     return 'Iya, iya denger kok'
@@ -114,13 +118,11 @@ export default class Ai {
     } 
 
     getMood() {
-        if (this.moodScore <= -10) {
-            return "marah"
-        } 
-        if (this.moodScore <= -2) { 
-            return "kesal"
-        }  
-        
-        return "normal" 
+        return Ai_Attitude.getAttitude(this.moodScore)
+    }
+
+    getMoodPresentase() {
+        const clamped = Math.max(-100, Math.min(100, this.moodScore));
+        return (clamped + 100) / 200;
     }
 }
