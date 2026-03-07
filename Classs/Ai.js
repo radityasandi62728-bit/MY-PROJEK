@@ -79,7 +79,7 @@ export default class Ai {
             if (lower.includes(key)) {
                 const keyCount = this.memory.filter(m => m.message.toLowerCase().includes(key)).length
                 if (keyCount > 1) {
-                    this.moodScore -= 1
+                    this.moodScore -= 2
                     return `hm, berhenti godain aku! push up 20x sana!`
                 }
                 this.moodScore += 2
@@ -88,7 +88,7 @@ export default class Ai {
                     return this.attitude.getrandomAttitude("angry")
                 }
                 if (mood === "kesal") {
-                    return 'Iya, iya denger kok'
+                    return this.attitude.getrandomAttitude("annoyed")
                 }
                 return this.renderbyMood(respon[key])
             }
