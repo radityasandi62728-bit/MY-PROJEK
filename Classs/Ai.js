@@ -6,6 +6,7 @@ export default class Ai {
         this.personality = "centil"
         this.memory = []
         this.moodScore = 0
+        this.topic = null
         this.attitude = new Ai_Attitude()
         this.startmoodRecovery()
     }
@@ -32,9 +33,23 @@ export default class Ai {
             response += `\n${this.Ai_name}: ${komentar}`
         }
 
-        this.memory.push({user: user.nama, message:text})
+        this.memory.push({
+            user: user.nama, 
+            message:text,
+            mood: this.getMood(),
+            time: Date.now(),
+            type: this.calculator.isMath(text) ? "math" : "chat"
+        })
+
+        if (this.memory.length % 5 === 0) {
+            const result = this.calculator.calculate(text)
+            return `Hasilnya ${result}. Ngomong-ngomong kamu lagi belajar apa?`
+        }
+        if (this.calculator.isMath(text).length > 5) {
+            return "Bisa bahas yang lain tidak?"
+        }
         console.log("Mood sekarang:", this.getMood(), "| Score:", this.moodScore)
-        return response += " " + tambahan
+        return response += " "
       
     }
 
@@ -84,7 +99,7 @@ export default class Ai {
                 }
                 this.moodScore += 2
                 const mood = this.getMood()
-                if (this.mood === "marah") {
+                if (mood === "marah") {
                     return this.attitude.getrandomAttitude("angry")
                 }
                 if (mood === "kesal") {

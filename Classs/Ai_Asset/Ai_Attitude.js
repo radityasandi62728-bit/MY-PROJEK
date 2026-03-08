@@ -7,8 +7,8 @@ export default class Ai_Attitude {
         this.excited = ["wah kamu jago matematika ya?", "keren banget, kamu suka matematika ya?"]
     }
     static getAttitude(score) {
-        if (score <= -10) return "angry";
-        if (score <= -20) return "annoyed";
+        if (score <= -20) return "angry";
+        if (score <= -10) return "annoyed";
         if (score < 10) return "neutral";
         if (score < 50) return "happy";
         return "excited";
