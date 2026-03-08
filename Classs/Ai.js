@@ -28,7 +28,7 @@ export default class Ai {
             response += this.responToUser(text)
         }
 
-        if (privousMathCount >= 2) {
+        if (privousMathCount >= 2 && this.calculator.isMath(text)) {
             const komentar = await this.speak()
             response += `\n${this.Ai_name}: ${komentar}`
         }
@@ -42,12 +42,18 @@ export default class Ai {
         })
 
         if (this.memory.length % 5 === 0) {
-            const result = this.calculator.calculate(text)
-            return `Hasilnya ${result}. Ngomong-ngomong kamu lagi belajar apa?`
+            return response + ` Ngomong-ngomong kamu lagi belajar apa?`
         }
-        if (this.calculator.isMath(text).length > 5) {
-            return "Bisa bahas yang lain tidak?"
+        if (this.calculator.isMath(text) && text.length > 5) {
+            response += "Bisa bahas yang lain tidak?"
         }
+
+        const topic = this.detectTopic(text)
+        if (topic) {
+            this.topic = topic
+            return `Ngomong-ngomong, kamu suka ${topic} ya?`
+        }
+
         console.log("Mood sekarang:", this.getMood(), "| Score:", this.moodScore)
         return response += " "
       
@@ -99,10 +105,10 @@ export default class Ai {
                 }
                 this.moodScore += 2
                 const mood = this.getMood()
-                if (mood === "marah") {
+                if (mood === "angry") {
                     return this.attitude.getrandomAttitude("angry")
                 }
-                if (mood === "kesal") {
+                if (mood === "annoyed") {
                     return this.attitude.getrandomAttitude("annoyed")
                 }
                 return this.renderbyMood(respon[key])
@@ -123,10 +129,10 @@ export default class Ai {
     }
     renderbyMood(text) {
         const mood = this.getMood()
-        if (mood === "marah") {
+        if (mood === "angry") {
             return `Aku sedang marah, jadi aku tidak bisa menjawab dengan baik.`
         }
-        if (mood === "kesal") {
+        if (mood === "annoyed") {
             return `Aku sedang kesal, jadi aku tidak bisa menjawab dengan baik.`
         }
         return text
@@ -139,5 +145,12 @@ export default class Ai {
     getMoodPresentase() {
         const clamped = Math.max(-100, Math.min(100, this.moodScore));
         return (clamped + 100) / 200;
+    }
+    detectTopic(text) {
+        const lower = text.toLowerCase()
+        if (lower.includes("matematika")) { return "math" }
+        if (lower.includes("belajar")) { return "study" }
+        if (lower.includes("game")) { return "game" }
+        return null
     }
 }
