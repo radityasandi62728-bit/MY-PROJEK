@@ -1,9 +1,11 @@
 import Ai_Attitude from "./Ai_Asset/Ai_Attitude.js"
+import NLP from "./Ai_Asset/NLP.js"
 export default class Ai {
     constructor(Ai_name, calculator) {
         this.Ai_name = Ai_name
         this.calculator = calculator
         this.personality = "centil"
+        this.nlp = new NLP()
         this.memory = []
         this.moodScore = 0
         this.topic = null
@@ -16,14 +18,23 @@ export default class Ai {
     async generateResponse(user, text) {
         await this.think()
         const mood = this.getMood();
+        const analisis = this.nlp.analis(text)
+
+        const intent = analisis.intent
+        const topic = analisis.topic
+        const sentiment = analisis.sentiment
         const tambahan = this.attitude.getrandomAttitude(mood);
 
         const privousMathCount = this.memory.filter(m => this.calculator.isMath(m.message)).length
         let response = ""
-        if (this.calculator.isMath(text)) {
+        if (intent === "math") {
             const result = this.calculator.calculate(text)
             response += this.makeCentil(`Hasil dari ${text} adalah ${result}.`)
             this.moodScore += 1
+        } else if (intent === "question") {
+            response += this.renderbyMood(`Itu pertanyaan yang menarik! Tapi maaf, aku belum bisa menjawabnya dengan baik.`)
+        } else if (intent === "greeting") {
+            response += this.renderbyMood(`Halo! Senang bertemu denganmu!`)
         } else {
             response += this.responToUser(text)
         }
@@ -48,7 +59,7 @@ export default class Ai {
             response += "Bisa bahas yang lain tidak?"
         }
 
-        const topic = this.detectTopic(text)
+
         if (topic) {
             this.topic = topic
             return `Ngomong-ngomong, kamu suka ${topic} ya?`
@@ -111,6 +122,12 @@ export default class Ai {
                 if (mood === "annoyed") {
                     return this.attitude.getrandomAttitude("annoyed")
                 }
+                if (sentiment === "positive") {
+                    this.moodScore += 2
+                }
+                if (sentiment === "negative") {
+                    this.moodScore -= 2
+                }
                 return this.renderbyMood(respon[key])
             }
         }
@@ -135,7 +152,7 @@ export default class Ai {
         if (mood === "annoyed") {
             return `Aku sedang kesal, jadi aku tidak bisa menjawab dengan baik.`
         }
-        return text
+        return text  
     } 
 
     getMood() {
