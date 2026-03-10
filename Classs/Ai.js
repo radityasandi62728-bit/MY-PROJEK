@@ -23,13 +23,14 @@ export default class Ai {
         const intent = analisis.intent
         const topic = analisis.topic
         const sentiment = analisis.sentiment
+        const mathExpression = this.calculator.extraMath(text)
         const tambahan = this.attitude.getrandomAttitude(mood);
 
         const privousMathCount = this.memory.filter(m => this.calculator.isMath(m.message)).length
         let response = ""
-        if (intent === "math") {
-            const result = this.calculator.calculate(text)
-            response += this.makeCentil(`Hasil dari ${text} adalah ${result}.`)
+       if (mathExpression) {
+            const result = this.calculator.calculate(mathExpression)
+            response += this.makeCentil(`Hasil dari ${mathExpression} adalah ${result}.`)
             this.moodScore += 1
         } else if (intent === "question") {
             response += this.renderbyMood(`Itu pertanyaan yang menarik! Tapi maaf, aku belum bisa menjawabnya dengan baik.`)
@@ -63,7 +64,7 @@ export default class Ai {
         if (topic) {
             this.topic = topic
             this.currentTopic = topic
-            return `Ngomong-ngomong, kamu suka ${topic} ya?`
+            response += `Ngomong-ngomong, kamu suka ${topic} ya?`
         }
 
         if(this.currentTopic === topic){

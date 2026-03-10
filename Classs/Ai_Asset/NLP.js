@@ -1,15 +1,15 @@
 export default class NLP {
     preprocess(text) {
-        return text.toLowerCase().trim()
+        return text.toLowerCase().replace(/[^\w\s]/g, "").trim()
     }
     tokenize(text) {
-        return text.split(/\s+/)
+        return text.match(/\d+|\w+|[+\-*/]/g) || []
     }
     detectIntent(tokens, text) {
         const greetings = ["halo", "hi", "hai", "hey"]
         const questionWords = ["apa", "bagaimana", "kenapa", "siapa", "dimana", "kapan"]
 
-        if(/\d+[\+\-\*\/]\d+/.test(tokens)){
+        if(/\d+[\+\-\*\/]\d+/.test(text)) {
             return "math"
         }
 
@@ -82,4 +82,9 @@ export default class NLP {
 
     }
 
+    generateResponse() {
+
+
+
+    }
 }

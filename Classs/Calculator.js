@@ -9,4 +9,8 @@ export default class Calculator {
             return null
         }
     }
+    extraMath(text) {
+        const match = text.match(/(\d+\s*[\+\-\*\/]\s*\d+)/)
+        return match ? match[0].replace(/\s+/g,"") : null
+    }
 }
