@@ -36,7 +36,7 @@ export default class Ai {
         } else if (intent === "greeting") {
             response += this.renderbyMood(`Halo! Senang bertemu denganmu!`)
         } else {
-            response += this.responToUser(text)
+            response += this.responToUser(text, sentiment)
         }
 
         if (privousMathCount >= 2 && this.calculator.isMath(text)) {
@@ -62,8 +62,28 @@ export default class Ai {
 
         if (topic) {
             this.topic = topic
+            this.currentTopic = topic
             return `Ngomong-ngomong, kamu suka ${topic} ya?`
         }
+
+        if(this.currentTopic === topic){
+            const topicResponses = {
+                    game: {
+                    fps: "FPS itu game tembak-tembakan kan?",
+                    rpg: "RPG biasanya punya cerita panjang ya"
+                    },
+
+                    study: {
+                    matematika: "Matematika memang menantang ya",
+                    tugas: "Tugas sekolah kadang bikin pusing"
+                    }
+                }
+            if(this.currentTopic){
+                const topicMap = topicResponses[this.currentTopic]
+                return topicMap[text.toLowerCase()] || `Kamu suka ${this.currentTopic} ya?`
+            }
+        }
+    
 
         console.log("Mood sekarang:", this.getMood(), "| Score:", this.moodScore)
         return response += " "
@@ -91,7 +111,7 @@ export default class Ai {
     }
     
 
-    responToUser(text) {
+    responToUser(text, sentiment) {
         const lower = text.toLowerCase()
 
         const repeatCount = this.memory.filter(m => m.message.toLowerCase().includes(lower)).length

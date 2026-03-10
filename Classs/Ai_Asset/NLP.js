@@ -5,7 +5,7 @@ export default class NLP {
     tokenize(text) {
         return text.split(/\s+/)
     }
-    detectIntent(tokens) {
+    detectIntent(tokens, text) {
         const greetings = ["halo", "hi", "hai", "hey"]
         const questionWords = ["apa", "bagaimana", "kenapa", "siapa", "dimana", "kapan"]
 
@@ -25,6 +25,12 @@ export default class NLP {
         }
         if (text.includes("Tolong") || text.includes("Bantu")) {
             return "request"
+        }
+        if (tokens.length === 1) {
+            const greetings = ["halo", "hi", "hai", "hey"]
+            if (greetings.includes(tokens[0])) {
+                return "greeting"
+            }
         }
         return "chat"
     }
@@ -62,15 +68,15 @@ export default class NLP {
     } 
 
     analis(text) {
-        console.log(`NLP menganalisis: ${text}`)
+    
         const clean = this.preprocess(text)
         const tokens = this.tokenize(clean)
 
     return {
         clean,
         tokens,
-        intent: this.detectIntent(tokens),
-        topic: this.detectTopic(clean),
+        intent: this.detectIntent(tokens, text, clean),
+        topic: this.detectTopic(tokens),
         sentiment: this.detectSentiment(tokens)
     }
 
