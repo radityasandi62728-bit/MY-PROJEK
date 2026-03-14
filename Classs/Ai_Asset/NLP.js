@@ -1,4 +1,11 @@
 export default class NLP {
+    constructor() {
+        this.wordBank = {
+            subjek : [],
+            predikat : [],
+            object : []
+        }
+    }
     preprocess(text) {
         return text.toLowerCase().replace(/[^\w\s]/g, "").trim()
     }
@@ -72,6 +79,8 @@ export default class NLP {
         const clean = this.preprocess(text)
         const tokens = this.tokenize(clean)
 
+        this.learnWord(tokens)
+
     return {
         clean,
         tokens,
@@ -82,9 +91,40 @@ export default class NLP {
 
     }
 
-    generateResponse() {
+    random(arr) {
+        if (arr.length === 0) {
+            return null
+        }
+        return arr[Math.floor(Math.random()*arr.length)]
+    }
 
+    generateWord() {
+        const o = this.random(this.wordBank.object)
+        const s = this.random(this.wordBank.subjek)
+        const p = this.random(this.wordBank.predikat)
 
+        if(!s || !p || !o) { 
+            return ""
+        }
+        return `${s} ${p} ${o}`
+    }
+    learnWord(tokens) {
+        
+        if (tokens.length < 3) return
+
+        const s = tokens[0]
+        const p = tokens[1]
+        const o = tokens.slice(2).join(" ")
+
+        if (!this.wordBank.subjek.includes(s)) {
+            this.wordBank.subjek.push(s)
+        }
+        if (!this.wordBank.object.includes(o)) {
+            this.wordBank.object.push(o)
+        }
+        if (!this.wordBank.predikat.includes(p)) {
+            this.wordBank.predikat.push(p)
+        }
 
     }
 }

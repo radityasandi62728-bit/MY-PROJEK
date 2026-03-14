@@ -24,7 +24,7 @@ export default class Ai {
         const topic = analisis.topic
         const sentiment = analisis.sentiment
         const mathExpression = this.calculator.extraMath(text)
-        const tambahan = this.attitude.getrandomAttitude(mood);
+        const word = this.nlp.generateWord()
 
         const privousMathCount = this.memory.filter(m => this.calculator.isMath(m.message)).length
         let response = ""
@@ -83,6 +83,10 @@ export default class Ai {
                 const topicMap = topicResponses[this.currentTopic]
                 return topicMap[text.toLowerCase()] || `Kamu suka ${this.currentTopic} ya?`
             }
+        }
+
+        if (word) {
+            response 
         }
     
 
