@@ -25,6 +25,7 @@ export default class Ai {
         const sentiment = analisis.sentiment
         const mathExpression = this.calculator.extraMath(text)
         const word = this.nlp.generateWord()
+        const entity = analisis.entity
 
         const privousMathCount = this.memory.filter(m => this.calculator.isMath(m.message)).length
         let response = ""
@@ -89,7 +90,6 @@ export default class Ai {
             response 
         }
     
-
         console.log("Mood sekarang:", this.getMood(), "| Score:", this.moodScore)
         return response += " "
       

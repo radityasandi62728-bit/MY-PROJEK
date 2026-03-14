@@ -86,7 +86,8 @@ export default class NLP {
         tokens,
         intent: this.detectIntent(tokens, text, clean),
         topic: this.detectTopic(tokens),
-        sentiment: this.detectSentiment(tokens)
+        sentiment: this.detectSentiment(tokens),
+        entity: this.extraEntity(tokens) 
     }
 
     }
@@ -126,5 +127,13 @@ export default class NLP {
             this.wordBank.predikat.push(p)
         }
 
+    }
+    extraEntity(tokens) {
+        const wordsQuestion = ["apa", "dimana", "siapa", "bagaimana", "mengapa", "kapan", "kenapa"]
+
+        if (wordsQuestion.includes(tokens[0])) {
+            return tokens.slice(1).join(" ")
+        }
+        return null
     }
 }
