@@ -47,17 +47,15 @@ export default class NLP {
             math : ["hitung", "matematika", "aljabar"],
             game : ["game", "main", "gaming"],
             study : ["belajar", "pelajaran", "tugas"],
-            romance : ["cinta", "pacar", "sayang"],
+            romance : ["cinta", "pacar", "sayang", "suka"],
         }
         
-        for (const topic in topics) {
-            for (const word of topics[topic]) {
-                if (tokens.includes(word)) {
-                    return topic
-                }
-            }
-        }
-        return null
+       const scores = {}
+       for (const topic in topics) {
+            scores[topic] = topics[topic].filter(w => tokens.includes(w)).length
+       }
+       const best = Object.entries(scores).sort((a, b) => b[1] - a[1])[0]
+        return best[1] > 0 ? best[0] : null
     }
     detectSentiment(tokens) {
         const positiveWords = ["baik", "bagus", "hebat", "keren", "suka"]
@@ -79,7 +77,19 @@ export default class NLP {
         const clean = this.preprocess(text)
         const tokens = this.tokenize(clean)
 
-        this.learnWord(tokens)
+        const intent = this.detectIntent(tokens, text)
+
+        if (intent !== "math") {
+            this.learnWord(tokens)
+        }
+        return {
+            clean,
+            tokens,
+            intent,
+            topic: this.detectTopic(tokens),
+            sentiment: this.detectSentiment(tokens),
+            entity: this.extraEntity(tokens)
+        }
 
     return {
         clean,
@@ -109,25 +119,44 @@ export default class NLP {
         }
         return `${s} ${p} ${o}`
     }
-    learnWord(tokens) {
-        
-        if (tokens.length < 3) return
+async learnWord(tokens) {
+    if (tokens.length < 3) return
 
-        const s = tokens[0]
-        const p = tokens[1]
-        const o = tokens.slice(2).join(" ")
+    const s = tokens[0]
+    const p = tokens[1]
+    const o = tokens.slice(2, 5).join(" ")
 
-        if (!this.wordBank.subjek.includes(s)) {
-            this.wordBank.subjek.push(s)
-        }
-        if (!this.wordBank.object.includes(o)) {
-            this.wordBank.object.push(o)
-        }
-        if (!this.wordBank.predikat.includes(p)) {
-            this.wordBank.predikat.push(p)
-        }
+    const isValid = (w) => /^[a-zA-Z]+$/.test(w)
 
+    if (!this.wordBank.subjek.includes(s) && isValid(s)) this.wordBank.subjek.push(s)
+    if (!this.wordBank.object.includes(o) && isValid(o)) this.wordBank.object.push(o)
+    if (!this.wordBank.predikat.includes(p) && isValid(p)) this.wordBank.predikat.push(p)
+
+    console.log("Mau kirim wordBank:", this.wordBank)
+
+    try {
+        const res = await fetch('http://localhost:3000/api/wordbank', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(this.wordBank)
+        })
+        const data = await res.json()
+        console.log("Response dari backend:", data) 
+    } catch (err) {
+        console.log("Error fetch:", err) 
     }
+}
+async loadWordBank() {
+    try {
+        const res = await fetch('http://localhost:3000/api/wordBank')
+        const data = await res.json()
+        this.wordBank = data
+
+        console.log("Mau kirim wordBank:", this.wordBank)
+    } catch (err) {
+        console.error('Error loading word bank:', err)
+    }
+}
     extraEntity(tokens) {
         const wordsQuestion = ["apa", "dimana", "siapa", "bagaimana", "mengapa", "kapan", "kenapa"]
 

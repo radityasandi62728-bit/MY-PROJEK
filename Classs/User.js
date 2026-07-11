@@ -1,3 +1,4 @@
+// Classs/User.js
 export default class User {
     constructor(nama) {
         this.nama = nama

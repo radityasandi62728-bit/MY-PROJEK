@@ -1,3 +1,4 @@
+// Classs/chatWeb.js
 export default class ChatWeb {
   constructor(user, ai) {
     this.user = user;

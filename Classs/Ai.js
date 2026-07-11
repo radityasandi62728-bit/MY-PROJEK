@@ -1,3 +1,4 @@
+// Classs/Ai.js
 import Ai_Attitude from "./Ai_Asset/Ai_Attitude.js"
 import NLP from "./Ai_Asset/NLP.js"
 export default class Ai {
@@ -11,6 +12,8 @@ export default class Ai {
         this.topic = null
         this.attitude = new Ai_Attitude()
         this.startmoodRecovery()
+
+        this.nlp.loadWordBank()
     }
     introduce(user) {
         return `Halo ${user.nama}, perkenalkan aku ${this.Ai_name}, senang bertemu denganmu!`
@@ -26,6 +29,8 @@ export default class Ai {
         const mathExpression = this.calculator.extraMath(text)
         const word = this.nlp.generateWord()
         const entity = analisis.entity
+        const tokens = text.toLowerCase().split(" ")
+        
 
         const privousMathCount = this.memory.filter(m => this.calculator.isMath(m.message)).length
         let response = ""
@@ -39,6 +44,10 @@ export default class Ai {
             response += this.renderbyMood(`Halo! Senang bertemu denganmu!`)
         } else {
             response += this.responToUser(text, sentiment)
+
+            if (word) {
+                response 
+            }
         }
 
         if (privousMathCount >= 2 && this.calculator.isMath(text)) {
@@ -80,15 +89,14 @@ export default class Ai {
                     tugas: "Tugas sekolah kadang bikin pusing"
                     }
                 }
-            if(this.currentTopic){
                 const topicMap = topicResponses[this.currentTopic]
-                return topicMap[text.toLowerCase()] || `Kamu suka ${this.currentTopic} ya?`
-            }
+                if (topicMap?.[text.toLowerCase()]) { 
+                    response += topicMap[text.toLowerCase()]
+
+                }
         }
 
-        if (word) {
-            response 
-        }
+        return response.trim() || "Maaf, aku tidak tahu harus bilang apa."
     
         console.log("Mood sekarang:", this.getMood(), "| Score:", this.moodScore)
         return response += " "
@@ -130,6 +138,7 @@ export default class Ai {
             "halo": "Halo",
             "celia": `Ya?, ada apa?`,
             "apa kabar": "Aku baik-baik saja, terima kasih sudah bertanya!",
+            "tau ga": "Stop! jangan godain aku -_-",
         }
 
         for (const key in respon) {

@@ -1,3 +1,4 @@
+// Classs/Ai_Asset/Ai_Attitude.js
 export default class Ai_Attitude {
     constructor() {
         this.angry = ["ugh apa lagi?", "boring banget sih, udah gitu aja masih nanya-nanya lagi"]
