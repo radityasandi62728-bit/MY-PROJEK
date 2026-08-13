@@ -4,33 +4,69 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Celia AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:ital,wght@0,400;0,600;0,700;1,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="CeliaAi.css">
 </head>
 <script type="module" src="mainWeb.js"></script>
 <body>
-    <link rel="stylesheet" href="CeliaAi.css">
     <div class="app">
         <main class="main-app">
+
             <section class="chat-log">
+                <header class="chat-log__header">
+                    <div class="chat-log__title">
+                        <span class="chat-log__eyebrow">Kamar Celia</span>
+                        <h1>Ngobrol sama Celia</h1>
+                    </div>
+                    <div class="chat-log__presence">
+                        <span class="presence-dot"></span> online
+                    </div>
+                </header>
+
                 <div class="messages">
+                    <!-- pesan akan di-render di sini oleh mainWeb.js -->
                 </div>
             </section>
+
             <aside class="Celia-panel">
-                <div class="ava">
-                    <img src="asset/chara_stand_1091_109102.png" alt="Celia Avatar">
+                <div class="window-frame">
+                
+                    <div class="window-glow"></div>
+                    <div class="ava">
+                        <video src="asset/HappyHorse-20260810-0001-1786336767686.mp4" autoplay loop muted playsinline></video>
+                    </div>
+                    <div class="sparkle sparkle--1">✦</div>
+                    <div class="sparkle sparkle--2">✦</div>
+                    <div class="sparkle sparkle--3">✧</div>
                 </div>
+
                 <div class="Ai-Status">
-                     <p>Mood: Netral</p>
-                     <p>Score: 0</p>
+                    <div class="status-row">
+                        <span class="status-label">Mood</span>
+                        <span class="status-value mood-value">Netral</span>
+                    </div>
+                    <div class="mood-meter">
+                        <div class="mood-meter__fill"></div>
+                    </div>
+                    <div class="status-row status-row--score">
+                        <span class="status-label">Score</span>
+                        <span class="status-value score-value">0</span>
+                    </div>
                 </div>
             </aside>
+
             <footer class="input-area">
                 <form class="input-form">
-                    <input type="text" class="input-field" placeholder="Type your message here...">
-                    <button type="submit" class="send-button">Send</button>
+                    <input type="text" class="input-field" placeholder="Ketik sesuatu ke Celia...">
+                    <button type="submit" class="send-button">
+                        <span>Kirim</span>
+                    </button>
                 </form>
             </footer>
-        </main>
 
+        </main>
     </div>
 </body>
 </html>

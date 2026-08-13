@@ -30,23 +30,41 @@ export default class Ai {
         const word = this.nlp.generateWord()
         const entity = analisis.entity
         const tokens = text.toLowerCase().split(" ")
-        
+
 
         const privousMathCount = this.memory.filter(m => this.calculator.isMath(m.message)).length
         let response = ""
-       if (mathExpression) {
+        if (mathExpression) {
             const result = this.calculator.calculate(mathExpression)
             response += this.makeCentil(`Hasil dari ${mathExpression} adalah ${result}.`)
             this.moodScore += 1
-        } else if (intent === "question") {
-            response += this.renderbyMood(`Itu pertanyaan yang menarik! Tapi maaf, aku belum bisa menjawabnya dengan baik.`)
-        } else if (intent === "greeting") {
-            response += this.renderbyMood(`Halo! Senang bertemu denganmu!`)
         } else {
-            response += this.responToUser(text, sentiment)
+            try {
+                try {
+                    const res = await fetch('http://localhost:3000/api/chat', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            message: text,
+                            mood: mood,
+                            personality: this.personality
+                        })
+                    })
+                    const data = await res.json()
 
-            if (word) {
-                response 
+                    if (data.reply) {
+                        response = data.reply
+                    } else {
+                        console.log("Gemini error, fallback ke lokal:", data.error)
+                        response = this.responToUser(text, sentiment)
+                    }
+                } catch (err) {
+                    console.log("Backend mati, fallback ke lokal")
+                    response = this.responToUser(text, sentiment)
+                }
+            } catch (err) {
+                console.log("Gemini offline, pakai response lokal")
+                response = this.responToUser(text, sentiment)
             }
         }
 
@@ -56,8 +74,8 @@ export default class Ai {
         }
 
         this.memory.push({
-            user: user.nama, 
-            message:text,
+            user: user.nama,
+            message: text,
             mood: this.getMood(),
             time: Date.now(),
             type: this.calculator.isMath(text) ? "math" : "chat"
@@ -77,38 +95,38 @@ export default class Ai {
             response += `Ngomong-ngomong, kamu suka ${topic} ya?`
         }
 
-        if(this.currentTopic === topic){
+        if (this.currentTopic === topic) {
             const topicResponses = {
-                    game: {
+                game: {
                     fps: "FPS itu game tembak-tembakan kan?",
                     rpg: "RPG biasanya punya cerita panjang ya"
-                    },
+                },
 
-                    study: {
+                study: {
                     matematika: "Matematika memang menantang ya",
                     tugas: "Tugas sekolah kadang bikin pusing"
-                    }
                 }
-                const topicMap = topicResponses[this.currentTopic]
-                if (topicMap?.[text.toLowerCase()]) { 
-                    response += topicMap[text.toLowerCase()]
+            }
+            const topicMap = topicResponses[this.currentTopic]
+            if (topicMap?.[text.toLowerCase()]) {
+                response += topicMap[text.toLowerCase()]
 
-                }
+            }
         }
 
-        return response.trim() || "Maaf, aku tidak tahu harus bilang apa."
-    
+        return (response || "Maaf, aku tidak tahu harus bilang apa.").trim()
+
         console.log("Mood sekarang:", this.getMood(), "| Score:", this.moodScore)
         return response += " "
-      
+
     }
 
     async speak() {
-       const kata_speak = [" uhh matematika lagi? bosan tau"," kamu suka matematika ya?"]
-       const random = kata_speak[Math.floor(Math.random() * kata_speak.length)]
+        const kata_speak = [" uhh matematika lagi? bosan tau", " kamu suka matematika ya?"]
+        const random = kata_speak[Math.floor(Math.random() * kata_speak.length)]
 
-       await new Promise(resolve => setTimeout(resolve, 2500))
-       return random
+        await new Promise(resolve => setTimeout(resolve, 2500))
+        return random
     }
 
     think() {
@@ -122,14 +140,14 @@ export default class Ai {
         const random = kata[Math.floor(Math.random() * kata.length)]
         return text + random
     }
-    
+
 
     responToUser(text, sentiment) {
         const lower = text.toLowerCase()
 
         const repeatCount = this.memory.filter(m => m.message.toLowerCase().includes(lower)).length
-        if (repeatCount > 1) { 
-            this.moodScore -= 1
+        if (repeatCount > 1) {
+            this.changeMood(-1)
             return `Kamu sudah bilang itu beberapa kali, berhenti ulang-ulang! push up 20x sana!`
         }
 
@@ -145,10 +163,10 @@ export default class Ai {
             if (lower.includes(key)) {
                 const keyCount = this.memory.filter(m => m.message.toLowerCase().includes(key)).length
                 if (keyCount > 1) {
-                    this.moodScore -= 2
+                    this.changeMood(-5)
                     return `hm, berhenti godain aku! push up 20x sana!`
                 }
-                this.moodScore += 2
+                
                 const mood = this.getMood()
                 if (mood === "angry") {
                     return this.attitude.getrandomAttitude("angry")
@@ -157,10 +175,10 @@ export default class Ai {
                     return this.attitude.getrandomAttitude("annoyed")
                 }
                 if (sentiment === "positive") {
-                    this.moodScore += 2
+                    this.changeMood(2)
                 }
                 if (sentiment === "negative") {
-                    this.moodScore -= 2
+                    this.changeMood(-2)
                 }
                 return this.renderbyMood(respon[key])
             }
@@ -171,10 +189,10 @@ export default class Ai {
     startmoodRecovery() {
         setInterval(() => {
             if (this.moodScore > 0) {
-                this.moodScore -= 1
+                this.changeMood(-1)
             }
             if (this.moodScore < 0) {
-                this.moodScore += 1
+                this.changeMood(1)
             }
         }, 50000)
     }
@@ -186,8 +204,8 @@ export default class Ai {
         if (mood === "annoyed") {
             return `Aku sedang kesal, jadi aku tidak bisa menjawab dengan baik.`
         }
-        return text  
-    } 
+        return text
+    }
 
     getMood() {
         return Ai_Attitude.getAttitude(this.moodScore)
@@ -196,6 +214,10 @@ export default class Ai {
     getMoodPresentase() {
         const clamped = Math.max(-100, Math.min(100, this.moodScore));
         return (clamped + 100) / 200;
+    }
+
+    changeMood(amount) {
+        this.moodScore=Math.max(-100, Math.min(100, this.moodScore + amount));
     }
     detectTopic(text) {
         const lower = text.toLowerCase()

@@ -1,93 +1,474 @@
+/* ============================================================
+   Celia AI — "Kamar Celia" theme
+   Palette:
+     --blush        #FBE3EC  (wallpaper base)
+     --blush-deep   #F3C4D6  (wallpaper shadow stripe)
+     --rose         #E88CA6  (primary accent / send button)
+     --rose-deep    #C9607F  (hover / pressed)
+     --cream        #FBF3EA  (panel / bubble surface)
+     --plum         #5A3B48  (main text)
+     --plum-soft    #8C6A78  (secondary text)
+     --gold         #D9A66C  (jewelry accent — mood meter, sparkles)
+   Type: Fredoka (display, rounded/characterful) + Nunito (body/UI)
+   Signature: the avatar sits in a little "window" with drawn curtains
+   and a warm light glow — she's looking out at whoever is chatting.
+   ============================================================ */
+
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
+
+:root {
+    --blush: #fbe3ec;
+    --blush-deep: #f3c4d6;
+    --rose: #e88ca6;
+    --rose-deep: #c9607f;
+    --cream: #fbf3ea;
+    --cream-dim: #f4e8db;
+    --plum: #5a3b48;
+    --plum-soft: #8c6a78;
+    --gold: #d9a66c;
+    --line: rgba(90, 59, 72, 0.12);
+    --shadow-soft: 0 12px 28px rgba(200, 120, 150, 0.18);
+    --radius-lg: 28px;
+    --radius-md: 18px;
+    --radius-sm: 12px;
+}
+
+html, body {
+    height: 100%;
+}
+
 body {
-    font-family: Arial, sans-serif;
-    height: 100vh;
-    background-color: #343434;
-    color: #333;
-    position: relative;
+    font-family: "Nunito", sans-serif;
+    color: var(--plum);
+    background:
+        repeating-linear-gradient(
+            135deg,
+            var(--blush) 0px,
+            var(--blush) 48px,
+            var(--blush-deep) 48px,
+            var(--blush-deep) 50px
+        );
+    background-attachment: fixed;
 }
+
+/* subtle floating dust / light motes across the whole room */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(3px 3px at 12% 20%, rgba(255,255,255,0.55), transparent),
+        radial-gradient(2px 2px at 78% 65%, rgba(255,255,255,0.5), transparent),
+        radial-gradient(2.5px 2.5px at 40% 80%, rgba(255,255,255,0.4), transparent),
+        radial-gradient(2px 2px at 60% 15%, rgba(255,255,255,0.45), transparent);
+    z-index: 0;
+}
+
 .app {
-    display: grid;
-    grid-template-rows: 1fr auto;
+    position: relative;
+    z-index: 1;
     height: 100vh;
+    padding: 22px;
 }
+
 .main-app {
+    height: 100%;
     display: grid;
-    grid-template-columns: 3fr 1fr;
-    gap: 30px;
-    width: 90%;
-    margin: 10px;
+    grid-template-columns: 1fr 340px;
+    grid-template-rows: 1fr auto;
+    grid-template-areas:
+        "chat panel"
+        "input panel";
+    gap: 18px;
+}
+
+/* ---------------------------------------------------------
+   Chat column (left)
+--------------------------------------------------------- */
+
+.chat-log {
+    grid-area: chat;
+    display: flex;
+    flex-direction: column;
+    background: var(--cream);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
     overflow: hidden;
 }
-.chat-log {
+
+.chat-log__header {
     display: flex;
-    padding: 15px;
-    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 26px;
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0));
+}
+
+.chat-log__eyebrow {
+    display: block;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--rose-deep);
+    font-weight: 700;
+    margin-bottom: 2px;
+}
+
+.chat-log__title h1 {
+    font-family: "Fredoka", sans-serif;
+    font-weight: 600;
+    font-size: 22px;
+    color: var(--plum);
+}
+
+.chat-log__presence {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
+    color: var(--plum-soft);
+    font-weight: 700;
+}
+
+.presence-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #7fc98f;
+    box-shadow: 0 0 0 4px rgba(127, 201, 143, 0.22);
+}
+
+.messages {
+    flex: 1;
     overflow-y: auto;
-    gap: 10px;
-    color: #000000;
+    padding: 22px 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
-.message {
-  padding: 10px 14px;
-  border-radius: 12px;
-  max-width: 70%;
+
+.messages:empty::before {
+    content: "Celia lagi lihat ke arahmu... sapa dia dulu, yuk~";
+    margin: auto;
+    font-family: "Fredoka", sans-serif;
+    font-size: 15px;
+    color: var(--plum-soft);
+    text-align: center;
+    padding: 40px 20px;
 }
-.message.user {
-  align-self: flex-end;
-  background-color: #d1e7ff;
+
+.messages::-webkit-scrollbar {
+    width: 8px;
 }
-.message.ai {
-  align-self: flex-start;
-  background-color: #e2e2e2;
+.messages::-webkit-scrollbar-thumb {
+    background: var(--blush-deep);
+    border-radius: 10px;
 }
-.celia-panel {
-  padding: 300px;
-  border-left: 1px solid #ddd;
-  background-color: #ffffff;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-right: 50px;
-  margin-top: 20px;
+
+/* Generic bubble styling — applies to whatever message elements
+   mainWeb.js renders inside .messages (e.g. .message, .msg, divs) */
+.messages > * {
+    max-width: 72%;
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    font-size: 14.5px;
+    line-height: 1.5;
+    background: #fff;
+    border: 1px solid var(--line);
+    box-shadow: 0 4px 10px rgba(200, 120, 150, 0.08);
+    align-self: flex-start;
+    border-bottom-left-radius: 6px;
 }
-.avatar img {
-  position: relative;
-  width: 120px;
-  border-radius: 50%;
-  margin: 20px;
-  left: 20px;
+
+.messages > .user,
+.messages > .from-user,
+.messages > [class*="user"] {
+    align-self: flex-end;
+    background: var(--rose);
+    color: #fff;
+    border: none;
+    border-bottom-right-radius: 6px;
+    border-bottom-left-radius: var(--radius-md);
 }
-.app-footer {
-  
-  padding: 12px;
-  border-top: 1px solid #ddd;
-  background-color: #bd3c3c;
+
+.messages > .celia,
+.messages > .ai,
+.messages > [class*="celia"],
+.messages > [class*="bot"] {
+    background: var(--cream-dim);
 }
-.input-area {
-  padding: 10px;
-  gap: 10px;
-  
-  
+
+/* ---------------------------------------------------------
+   Character panel (right) — the "window" Celia looks out from
+--------------------------------------------------------- */
+
+.Celia-panel {
+    grid-area: panel;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
-.input-form {
-  display: flex;
-  gap: 10px;
+
+.window-frame {
+    position: relative;
+    flex: 1;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: linear-gradient(180deg, #fff7f0 0%, var(--cream) 60%, var(--blush-deep) 100%);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-soft);
 }
-.input-form input {
-  flex: 1;
-  padding: 10px;
+
+.window-glow {
+    position: absolute;
+    top: -10%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 140%;
+    height: 60%;
+    background: radial-gradient(closest-side, rgba(255, 236, 214, 0.85), rgba(255, 236, 214, 0));
+    pointer-events: none;
+    z-index: 1;
 }
-.input-form button {
-  padding: 10px 16px;
-  cursor: pointer;
+
+.ava {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
 }
+
+.ava video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    -webkit-mask-image: linear-gradient(180deg, #000 88%, transparent 100%);
+    mask-image: linear-gradient(180deg, #000 88%, transparent 100%);
+}
+
+/* drawn curtains peeking in from both corners */
+.curtain {
+    position: absolute;
+    top: -4%;
+    width: 34%;
+    height: 46%;
+    z-index: 3;
+    background: linear-gradient(180deg, var(--rose) 0%, var(--rose-deep) 100%);
+    opacity: 0.9;
+    filter: drop-shadow(0 6px 10px rgba(90, 59, 72, 0.18));
+}
+
+.curtain--left {
+    left: -6%;
+    border-radius: 0 0 60% 10%;
+    transform: rotate(3deg);
+}
+
+.curtain--right {
+    right: -6%;
+    border-radius: 0 0 10% 60%;
+    transform: rotate(-3deg);
+}
+
+.curtain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        100deg,
+        rgba(255,255,255,0.12) 0px,
+        rgba(255,255,255,0.12) 6px,
+        transparent 6px,
+        transparent 16px
+    );
+}
+
+.sparkle {
+    position: absolute;
+    z-index: 4;
+    color: var(--gold);
+    font-size: 14px;
+    opacity: 0.85;
+    animation: twinkle 2.6s ease-in-out infinite;
+}
+.sparkle--1 { top: 14%; left: 12%; animation-delay: 0s; }
+.sparkle--2 { top: 24%; right: 14%; font-size: 10px; animation-delay: 0.7s; }
+.sparkle--3 { top: 40%; right: 22%; font-size: 12px; animation-delay: 1.4s; }
+
+@keyframes twinkle {
+    0%, 100% { opacity: 0.2; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.1); }
+}
+
+/* ---------------------------------------------------------
+   Status card
+--------------------------------------------------------- */
+
 .Ai-Status {
-  margin-top: 30px;
-  font-size: 20px;
-  color: #efefef;
-  
+    background: var(--cream);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    padding: 16px 18px;
+    box-shadow: var(--shadow-soft);
+}
+
+.status-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13px;
+}
+
+.status-row--score {
+    margin-top: 10px;
+}
+
+.status-label {
+    color: var(--plum-soft);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 11px;
+}
+
+.status-value {
+    font-family: "Fredoka", sans-serif;
+    font-weight: 600;
+    color: var(--plum);
+    font-size: 14px;
+}
+
+.mood-meter {
+    margin-top: 8px;
+    height: 8px;
+    border-radius: 6px;
+    background: var(--blush-deep);
+    overflow: hidden;
+}
+
+.mood-meter__fill {
+    height: 100%;
+    width: 50%; /* set via JS: style.width = getMoodPresentase() * 100 + '%' */
+    background: linear-gradient(90deg, var(--gold), var(--rose));
+    border-radius: 6px;
+    transition: width 0.4s ease;
+}
+
+/* ---------------------------------------------------------
+   Input area
+--------------------------------------------------------- */
+
+.input-area {
+    grid-area: input;
+}
+
+.input-form {
+    display: flex;
+    gap: 10px;
+    background: var(--cream);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    padding: 10px;
+    box-shadow: var(--shadow-soft);
+}
+
+.input-field {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    font-family: "Nunito", sans-serif;
+    font-size: 14.5px;
+    color: var(--plum);
+}
+
+.input-field::placeholder {
+    color: var(--plum-soft);
+    opacity: 0.7;
+}
+
+.input-field:focus {
+    border-color: var(--rose);
+    box-shadow: 0 0 0 3px rgba(232, 140, 166, 0.18);
+}
+
+.send-button {
+    border: none;
+    cursor: pointer;
+    padding: 0 22px;
+    border-radius: var(--radius-sm);
+    background: var(--rose);
+    color: #fff;
+    font-family: "Fredoka", sans-serif;
+    font-weight: 600;
+    font-size: 14.5px;
+    letter-spacing: 0.02em;
+    transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.send-button:hover {
+    background: var(--rose-deep);
+}
+
+.send-button:active {
+    transform: scale(0.96);
+}
+
+.send-button:focus-visible,
+.input-field:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------
+   Responsive — stack panel above chat on narrow screens
+--------------------------------------------------------- */
+
+@media (max-width: 860px) {
+    .app {
+        padding: 12px;
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .main-app {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr auto;
+        grid-template-areas:
+            "panel"
+            "chat"
+            "input";
+        height: auto;
+    }
+
+    .window-frame {
+        aspect-ratio: 16 / 9;
+    }
+
+    .messages > * {
+        max-width: 86%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sparkle {
+        animation: none;
+    }
+    .mood-meter__fill {
+        transition: none;
+    }
 }

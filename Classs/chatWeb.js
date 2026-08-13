@@ -21,17 +21,17 @@ export default class ChatWeb {
     return this.queue;
   }
 
-  addMessage(text, sender) {
-    const chatLog = document.querySelector(".chat-log");
+ addMessage(text, sender) {
+    const messages = document.querySelector(".messages");
     const message = document.createElement("div");
     message.classList.add("message", sender);
     message.textContent = text;
-    chatLog.appendChild(message);
-    chatLog.scrollTop = chatLog.scrollHeight;
-  }
+    messages.appendChild(message);
+    messages.scrollTop = messages.scrollHeight;
+}
 
-  removeLastMessage() {
-    const chatLog = document.querySelector(".chat-log");
-    chatLog.removeChild(chatLog.lastChild);
-  }
+removeLastMessage() {
+    const messages = document.querySelector(".messages");
+    messages.removeChild(messages.lastChild);
+}
 }
